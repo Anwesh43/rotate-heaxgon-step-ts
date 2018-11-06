@@ -73,7 +73,7 @@ class Animator {
         }
     }
 
-    stop(cb : Function) {
+    stop() {
         if (this.animated) {
             this.animated = false
             clearInterval(this.interval)
@@ -171,5 +171,27 @@ class RotateHexagonStep {
 
     startUpdating(cb : Function) {
         this.curr.startUpdating(cb)
+    }
+}
+
+class Renderer {
+    rhs : RotateHexagonStep = new RotateHexagonStep()
+
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.rhs.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.rhs.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.rhs.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
     }
 }
