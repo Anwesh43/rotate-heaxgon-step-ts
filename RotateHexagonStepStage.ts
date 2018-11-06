@@ -40,7 +40,7 @@ const divideScale : Function = (scale : number, i : number, n : number) : number
 const getSf : Function = (sc : number) : number => Math.floor(sc/0.5)
 
 const scaleFactor : Function = (dir : number, scale : number) : number => {
-    return 0.05 * this.dir * ((1 - getSf())/lines + getSf())
+    return 0.05 * dir * ((1 - getSf(scale))/lines + getSf(scale))
 }
 
 class State {
@@ -49,7 +49,9 @@ class State {
     prevScale : number = 0
 
     update(cb : Function) {
-        this.scale += scaleFactor(this.dir, this.scale)
+        const k : number = scaleFactor(this.dir, this.scale)
+        console.log(`scale factor is ${k}`)
+        this.scale += k
         if (Math.abs(this.scale - this.prevScale) > 1) {
             this.scale = this.prevScale + this.dir
             this.dir = 0
