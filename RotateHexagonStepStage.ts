@@ -80,3 +80,67 @@ class Animator {
         }
     }
 }
+
+class RHSNode {
+
+    next : RHSNode
+    prev : RHSNode
+    state : State = new State()
+
+    constructor(private i : number) {
+        this.addNeighbor()
+    }
+
+    addNeighbor() {
+        if (this.i < nodes - 1) {
+            this.next = new RHSNode(this.i + 1)
+            this.next.prev = this
+        }
+    }
+
+    draw(context : CanvasRenderingContext2D) {
+        const gap : number = w / (nodes + 1)
+        const size : number = gap / 3
+        const sc1 = divideScale(this.state.scale, 0, 2)
+        const sc2 = divideScale(this.state.scale, 1, 2)
+        context.lineWidth = Math.min(w, h) / 60
+        context.lineCap = 'round'
+        context.strokeStyle = '#311B92'
+        context.save()
+        context.translate(gap * (this.i + 1), h/2)
+        context.rotate(Math.PI * sc2)
+        for(var i = 0; i < lines; i++) {
+            const sc : number = divideScale(sc1, i, lines)
+            context.save()
+            context.scale(1, 1 - 2 * i)
+            context.beginPath()
+            context.moveTo(-size, 0)
+            context.lineTo(-size + size/5, -size/2 * sc)
+            context.lineTo(size - size/5, -size/2 * sc)
+            context.lineTo(size, 0)
+            context.stroke()
+            context.restore()
+        }
+        context.restore()
+    }
+
+    update(cb : Function) {
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
+    }
+
+    getNext(dir : number, cb : Function) : RHSNode {
+        var curr : RHSNode = this.prev
+        if (dir == 1) {
+            curr = this.next
+        }
+        if (curr) {
+            return curr
+        }
+        cb()
+        return this
+    }
+}
